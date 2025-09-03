@@ -1,0 +1,64 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    overflow: hidden;
+    background: #2a2d3a;
+    font-family: 'Arial', sans-serif;
+    position: relative;
+}
+
+#rain-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    background: transparent;
+}
+
+.background-shapes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #2a2d3a 0%, #3e4147 50%, #2a2d3a 100%);
+    z-index: 1;
+}
+
+/* Add some geometric background elements similar to the demo */
+.background-shapes::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 200'%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='1' opacity='0.1'%3E%3Cpath d='M100 150 L200 100 L300 120 L400 80 L500 110 L600 90 L700 130 L800 70 L900 100'/%3E%3Ccircle cx='150' cy='120' r='15'/%3E%3Ccircle cx='350' cy='100' r='20'/%3E%3Ccircle cx='550' cy='95' r='18'/%3E%3Ccircle cx='750' cy='110' r='16'/%3E%3Cpolygon points='250,140 270,120 290,140 270,160'/%3E%3Cpolygon points='450,130 480,110 510,130 480,150'/%3E%3Cpolygon points='650,125 680,105 710,125 680,145'/%3E%3Crect x='820' y='115' width='25' height='25' rx='3'/%3E%3C/g%3E%3C/svg%3E") repeat-x;
+    background-size: 1000px 200px;
+    animation: float 20s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Add some subtle overlay patterns */
+body::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.01) 0%, transparent 80%);
+    pointer-events: none;
+    z-index: 5;
+}
