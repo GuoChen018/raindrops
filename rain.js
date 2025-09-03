@@ -62,13 +62,15 @@ const rightWall = Bodies.rectangle(window.innerWidth + 25, window.innerHeight / 
 
 World.add(world, [ground, leftWall, rightWall]);
 
-// Create circular obstacles that raindrops can bounce off
+// Create draggable circular obstacles that raindrops can bounce off
 function createCircleObstacles() {
     // Small circle on the left
     const smallCircle = Bodies.circle(window.innerWidth * 0.15, window.innerHeight * 0.6, 40, {
-        isStatic: true,
+        isStatic: false,
+        frictionAir: 0.3, // High air resistance to settle quickly when released
+        density: 0.001, // Very light so they don't fall
         render: {
-            fillStyle: 'transparent',
+            fillStyle: 'rgba(255, 255, 255, 0.05)',
             strokeStyle: 'rgba(255, 255, 255, 0.8)',
             lineWidth: 2
         },
@@ -80,9 +82,11 @@ function createCircleObstacles() {
     
     // Medium circle at bottom center
     const mediumCircle = Bodies.circle(window.innerWidth * 0.5, window.innerHeight * 0.75, 60, {
-        isStatic: true,
+        isStatic: false,
+        frictionAir: 0.3,
+        density: 0.001,
         render: {
-            fillStyle: 'transparent',
+            fillStyle: 'rgba(255, 255, 255, 0.05)',
             strokeStyle: 'rgba(255, 255, 255, 0.8)',
             lineWidth: 2
         },
@@ -94,9 +98,11 @@ function createCircleObstacles() {
     
     // Large circle on the right
     const largeCircle = Bodies.circle(window.innerWidth * 0.85, window.innerHeight * 0.45, 80, {
-        isStatic: true,
+        isStatic: false,
+        frictionAir: 0.3,
+        density: 0.001,
         render: {
-            fillStyle: 'transparent',
+            fillStyle: 'rgba(255, 255, 255, 0.05)',
             strokeStyle: 'rgba(255, 255, 255, 0.8)',
             lineWidth: 2
         },
@@ -108,6 +114,12 @@ function createCircleObstacles() {
     
     circles = [smallCircle, mediumCircle, largeCircle];
     World.add(world, circles);
+    
+    // Keep circles relatively stationary when not being dragged
+    circles.forEach(circle => {
+        Body.setVelocity(circle, { x: 0, y: 0 });
+        Body.setAngularVelocity(circle, 0);
+    });
 }
 
 function createGroundElements() {
@@ -276,12 +288,12 @@ function handleResize() {
     createCircleObstacles();
 }
 
-// Add mouse interaction
+// Add mouse interaction for dragging circles
 const mouse = Mouse.create(render.canvas);
 const mouseConstraint = MouseConstraint.create(engine, {
     mouse: mouse,
     constraint: {
-        stiffness: 0.2,
+        stiffness: 0.8,
         render: {
             visible: false
         }
@@ -289,6 +301,25 @@ const mouseConstraint = MouseConstraint.create(engine, {
 });
 
 World.add(world, mouseConstraint);
+
+// Add event listeners for better circle dragging behavior
+Events.on(mouseConstraint, 'startdrag', (event) => {
+    const body = event.body;
+    if (circles.includes(body)) {
+        // Reduce air resistance while dragging for smoother movement
+        Body.set(body, 'frictionAir', 0.05);
+    }
+});
+
+Events.on(mouseConstraint, 'enddrag', (event) => {
+    const body = event.body;
+    if (circles.includes(body)) {
+        // Increase air resistance when released to settle quickly
+        Body.set(body, 'frictionAir', 0.3);
+        // Stop any rotation
+        Body.setAngularVelocity(body, 0);
+    }
+});
 
 // Initialize
 createGroundElements();
@@ -299,6 +330,29 @@ Render.run(render);
 
 // Spawn rain continuously  
 setInterval(spawnRain, 80);
+
+// Keep circles floating (counteract gravity)
+setInterval(() => {
+    circles.forEach(circle => {
+        // If circle is not being dragged, apply anti-gravity force
+        if (!mouseConstraint.body || mouseConstraint.body !== circle) {
+            // Apply upward force to counteract gravity
+            const antiGravityForce = {
+                x: 0,
+                y: -circle.mass * engine.world.gravity.y
+            };
+            Body.applyForce(circle, circle.position, antiGravityForce);
+            
+            // Dampen horizontal movement when not being dragged
+            if (Math.abs(circle.velocity.x) > 0.1) {
+                Body.setVelocity(circle, {
+                    x: circle.velocity.x * 0.95,
+                    y: circle.velocity.y
+                });
+            }
+        }
+    });
+}, 16); // Run at ~60fps
 
 // Handle window resize
 window.addEventListener('resize', handleResize);
@@ -390,11 +444,24 @@ Events.on(engine, 'collisionStart', (event) => {
     });
 });
 
-// Add some interactive effects when clicking
+// Add some interactive effects when clicking (but not when dragging circles)
 render.canvas.addEventListener('click', (event) => {
+    // Don't create raindrops if we just finished dragging something
+    if (mouseConstraint.body) return;
+    
     const rect = render.canvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
+    
+    // Check if click was on a circle (don't create raindrops on circles)
+    const clickedCircle = circles.find(circle => {
+        const dx = x - circle.position.x;
+        const dy = y - circle.position.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        return distance <= circle.circleRadius;
+    });
+    
+    if (clickedCircle) return;
     
     // Create a burst of raindrops at click position
     for (let i = 0; i < 12; i++) {
