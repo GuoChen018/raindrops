@@ -69,7 +69,7 @@ function createCircleObstacles() {
         isStatic: true,
         render: {
             fillStyle: '#2a2d3a',
-            strokeStyle: 'rgba(62, 65, 71, 0.8)',
+            strokeStyle: 'rgba(255, 255, 255, 0.8)',
             lineWidth: 2
         },
         collisionFilter: {
@@ -83,7 +83,7 @@ function createCircleObstacles() {
         isStatic: true,
         render: {
             fillStyle: '#2a2d3a',
-            strokeStyle: 'rgba(62, 65, 71, 0.8)',
+            strokeStyle: 'rgba(255, 255, 255, 0.8)',
             lineWidth: 2
         },
         collisionFilter: {
@@ -97,7 +97,7 @@ function createCircleObstacles() {
         isStatic: true,
         render: {
             fillStyle: '#2a2d3a',
-            strokeStyle: 'rgba(62, 65, 71, 0.8)',
+            strokeStyle: 'rgba(255, 255, 255, 0.8)',
             lineWidth: 2
         },
         collisionFilter: {
