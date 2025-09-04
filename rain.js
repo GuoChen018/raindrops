@@ -68,9 +68,9 @@ function createCircleObstacles() {
     const smallCircle = Bodies.circle(window.innerWidth * 0.15, window.innerHeight * 0.6, 40, {
         isStatic: true,
         render: {
-            fillStyle: 'rgba(255, 255, 255, 0.1)',
-            strokeStyle: 'rgba(255, 255, 255, 0.9)',
-            lineWidth: 3
+            fillStyle: '#2a2d3a',
+            strokeStyle: 'rgba(62, 65, 71, 0.8)',
+            lineWidth: 2
         },
         collisionFilter: {
             category: 0x0001,
@@ -82,9 +82,9 @@ function createCircleObstacles() {
     const mediumCircle = Bodies.circle(window.innerWidth * 0.5, window.innerHeight * 0.75, 60, {
         isStatic: true,
         render: {
-            fillStyle: 'rgba(255, 255, 255, 0.1)',
-            strokeStyle: 'rgba(255, 255, 255, 0.9)',
-            lineWidth: 3
+            fillStyle: '#2a2d3a',
+            strokeStyle: 'rgba(62, 65, 71, 0.8)',
+            lineWidth: 2
         },
         collisionFilter: {
             category: 0x0001,
@@ -96,9 +96,9 @@ function createCircleObstacles() {
     const largeCircle = Bodies.circle(window.innerWidth * 0.85, window.innerHeight * 0.45, 80, {
         isStatic: true,
         render: {
-            fillStyle: 'rgba(255, 255, 255, 0.1)',
-            strokeStyle: 'rgba(255, 255, 255, 0.9)',
-            lineWidth: 3
+            fillStyle: '#2a2d3a',
+            strokeStyle: 'rgba(62, 65, 71, 0.8)',
+            lineWidth: 2
         },
         collisionFilter: {
             category: 0x0001,
