@@ -10,6 +10,9 @@ An interactive rain scene built with Matter.js, inspired by the [Matter.js mixed
 - **Smart Collision Physics**: Different behaviors for ground vs circle impacts
 - **Splash Effects**: Small bouncing droplets when rain hits surfaces
 - **Deflection Effects**: Raindrops deflect and continue falling after hitting circles
+- **Immersive Audio System**: Calming rain sounds with Web Audio API
+- **Interactive Sound Effects**: Different pitched sounds for different surface impacts
+- **Audio Controls**: Toggle sound on/off and adjust volume with elegant UI controls
 - **Mouse Interaction**: Click anywhere to create a burst of raindrops
 - **Responsive Design**: Adapts to different screen sizes
 
@@ -40,7 +43,9 @@ Then open your browser and navigate to `http://localhost:8000`
 
 - **Click**: Create a burst of raindrops at the cursor position
 - **Circle Physics**: Watch raindrops bounce off circular obstacles at realistic angles
-- **Automatic**: Rain falls continuously and creates splash effects when hitting surfaces
+- **Audio Controls**: Use the sound button (🔊/🔇) and volume slider in the top-right corner
+- **Sound Effects**: Listen for subtle 'plink' sounds when rain hits different surfaces
+- **Automatic**: Rain falls continuously with immersive audio and visual effects
 
 ## Technical Details
 
@@ -51,6 +56,11 @@ Then open your browser and navigate to `http://localhost:8000`
 - Dynamic splash effects with tiny bouncing droplets when rain hits surfaces
 - Realistic deflection physics - raindrops bounce off circles and continue falling
 - Smart collision detection that differentiates between ground and circle impacts
+- **Web Audio API sound system** with procedural rain audio generation
+- **Filtered white noise** creates continuous calming rain background
+- **Impact sound effects** with frequency variation based on surface type
+- **Audio controls** with volume adjustment and mute functionality
+- Cross-browser audio compatibility with graceful fallbacks
 - Responsive design with window resize handling
 
 Enjoy watching the rain! 🌧️
