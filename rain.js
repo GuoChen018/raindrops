@@ -334,8 +334,6 @@ Events.on(engine, 'collisionStart', (event) => {
                 const circleCenter = hitSurface.position;
                 const impactAngle = Math.atan2(y - circleCenter.y, x - circleCenter.x);
                 
-                // Play higher pitched sound for circle impacts
-                playDropSound(1200 + Math.random() * 400, 0.05);
                 
                 // Create splash effects
                 const numBounces = 2 + Math.floor(Math.random() * 3);
@@ -373,10 +371,6 @@ Events.on(engine, 'collisionStart', (event) => {
                 
             } else {
                 // Ground collision - create normal bounce behavior
-                // Play lower pitched sound for ground impacts (less frequent to avoid noise)
-                if (Math.random() < 0.3) {
-                    playDropSound(600 + Math.random() * 200, 0.03);
-                }
                 
                 const numBounces = 1 + Math.floor(Math.random() * 3);
                 for (let i = 0; i < numBounces; i++) {
@@ -420,152 +414,3 @@ render.canvas.addEventListener('click', (event) => {
     }
 });
 
-// Audio System for Rain Sounds
-let audioContext = null;
-let backgroundRainGain = null;
-let isAudioEnabled = false;
-let masterVolume = 0.3;
-
-// Initialize Audio Context
-function initAudio() {
-    try {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        
-        // Create background rain sound
-        createBackgroundRain();
-        
-        return true;
-    } catch (error) {
-        console.log('Audio not supported:', error);
-        return false;
-    }
-}
-
-// Create continuous background rain sound
-function createBackgroundRain() {
-    if (!audioContext) return;
-    
-    // Create white noise for rain background
-    const bufferSize = 2 * audioContext.sampleRate;
-    const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-    const output = noiseBuffer.getChannelData(0);
-    
-    // Generate filtered white noise that sounds like rain
-    for (let i = 0; i < bufferSize; i++) {
-        output[i] = (Math.random() * 2 - 1) * 0.1;
-    }
-    
-    // Apply simple filter to make it sound more like rain
-    for (let i = 1; i < bufferSize; i++) {
-        output[i] = output[i] * 0.8 + output[i - 1] * 0.2;
-    }
-    
-    // Create gain node for volume control
-    backgroundRainGain = audioContext.createGain();
-    backgroundRainGain.gain.value = 0;
-    backgroundRainGain.connect(audioContext.destination);
-    
-    // Function to play rain sound continuously
-    function playRainLoop() {
-        if (!audioContext || !isAudioEnabled) return;
-        
-        const source = audioContext.createBufferSource();
-        source.buffer = noiseBuffer;
-        source.loop = true;
-        source.connect(backgroundRainGain);
-        source.start();
-        
-        return source;
-    }
-    
-    // Start the rain loop
-    let rainSource = playRainLoop();
-    
-    // Restart loop when needed (Web Audio requires restart occasionally)
-    setInterval(() => {
-        if (isAudioEnabled && audioContext.state === 'running') {
-            if (rainSource) {
-                rainSource.stop();
-            }
-            rainSource = playRainLoop();
-        }
-    }, 30000); // Restart every 30 seconds
-}
-
-// Create impact sound for raindrops hitting surfaces
-function playDropSound(frequency = 800, volume = 0.1) {
-    if (!audioContext || !isAudioEnabled) return;
-    
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    
-    // Create a quick "plink" sound
-    oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(frequency * 0.3, audioContext.currentTime + 0.1);
-    
-    gainNode.gain.setValueAtTime(volume * masterVolume, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
-    
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.1);
-}
-
-// Update volume
-function setVolume(volume) {
-    masterVolume = volume / 100;
-    if (backgroundRainGain) {
-        backgroundRainGain.gain.value = isAudioEnabled ? masterVolume * 0.3 : 0;
-    }
-}
-
-// Toggle audio on/off
-function toggleAudio() {
-    if (!audioContext) {
-        if (!initAudio()) {
-            alert('Audio not supported in this browser');
-            return;
-        }
-    }
-    
-    isAudioEnabled = !isAudioEnabled;
-    
-    if (isAudioEnabled) {
-        audioContext.resume();
-        if (backgroundRainGain) {
-            backgroundRainGain.gain.value = masterVolume * 0.3;
-        }
-    } else {
-        if (backgroundRainGain) {
-            backgroundRainGain.gain.value = 0;
-        }
-    }
-    
-    updateAudioButton();
-}
-
-// Update button text and style
-function updateAudioButton() {
-    const button = document.getElementById('audio-toggle');
-    if (isAudioEnabled) {
-        button.textContent = '🔊 Sound On';
-        button.classList.remove('muted');
-    } else {
-        button.textContent = '🔇 Sound Off';
-        button.classList.add('muted');
-    }
-}
-
-// Setup audio controls
-document.addEventListener('DOMContentLoaded', () => {
-    const audioButton = document.getElementById('audio-toggle');
-    const volumeSlider = document.getElementById('volume-slider');
-    
-    audioButton.addEventListener('click', toggleAudio);
-    volumeSlider.addEventListener('input', (e) => setVolume(e.target.value));
-    
-    // Set initial volume
-    setVolume(30);
-});
