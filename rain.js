@@ -218,7 +218,7 @@ function spawnRain() {
     });
     
     // Add new raindrops
-    for (let i = 0; i < 5 + Math.random() * 8; i++) {
+    for (let i = 0; i < 2 + Math.random() * 4; i++) {
         const x = Math.random() * window.innerWidth;
         const y = -20 - Math.random() * 100;
         const raindrop = createRaindrop(x, y);
